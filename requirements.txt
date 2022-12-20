@@ -1,6 +1,7 @@
-pysimplegui
-pillow
 matplotlib
 numpy
 opencv-python
 openslide-python
+pillow
+pysimplegui
+scikit-image

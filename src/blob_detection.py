@@ -10,7 +10,7 @@ im = cv2.imread(file_name, cv2.IMREAD_GRAYSCALE)
 im = cv2.resize(im, (1000, 1000))
 im = cv2.dilate(im, (5, 5), iterations=1)
 im = cv2.bitwise_not(im)
-# im = cv2.blur(im, (2, 2))
+
 
 params = cv2.SimpleBlobDetector_Params()
 print(params.filterByInertia)
