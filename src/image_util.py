@@ -27,8 +27,8 @@ def displayImage(title, img, column, parent):
     canvas.pack(side=LEFT, fill=BOTH, expand=True)
 
 
-def pixel_difference(pixel1, pixel2):
-    return abs(pixel1[0] - pixel2[0]) + abs(pixel1[1] - pixel2[1])  + abs(pixel1[2] - pixel2[2])
+def pixel_difference(pixel1, pixel2, weights):
+    return weights[0]*abs(pixel1[0] - pixel2[0]) + weights[1]*abs(pixel1[1] - pixel2[1])  + weights[2]*abs(pixel1[2] - pixel2[2])
 
 # TODO: very slow, optimize with opencv functions or NumPy
 # Or: write in C using Cython?
@@ -43,14 +43,16 @@ def calc_contrast(x, y, width, height, pixel_map):
     for i in range(x - radius, x + radius + 1, 1):
         for j in range(y - radius, y + radius + 1, 1):
             if 0 <= i < width and 0 <= j < height:
-                difference_sum += pixel_difference(center_pixel, pixel_map[i, j])
+                difference_sum += pixel_difference(center_pixel, pixel_map[i, j], (1, 1, 1))
                 pixel_count += 1
 
     # calculate average difference
     return int(difference_sum / (pixel_count * 3))
 
 def cutoff(pixel, target, max_difference):
-    if (pixel_difference(pixel, target) <= max_difference):
+    # give the red channel a greater weight
+    weights = (1, 1, 1) # (R, G, B)
+    if (pixel_difference(pixel, target, weights) <= max_difference):
         return (255, 255, 255)
     else:
         return (0, 0, 0)

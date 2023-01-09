@@ -26,11 +26,11 @@ for cnt in cnts:
     elif area > small:
         small_cnts.append(cnt)
 
-org = cv2.drawContours(org, large_cnts, -1, (0, 0, 255), 5)
-org = cv2.drawContours(org, medium_cnts, -1, (0, 255, 255), 5)
-org = cv2.drawContours(org, small_cnts, -1, (0, 255, 0), 5)
+im = cv2.drawContours(im, large_cnts, -1, (0, 0, 255), 5)
+im = cv2.drawContours(im, medium_cnts, -1, (0, 255, 255), 5)
+im = cv2.drawContours(im, small_cnts, -1, (0, 255, 0), 5)
 
-cv2.imwrite("contrours.png", org)
+cv2.imwrite("contrours.png", im)
 
 f = open("results.txt", "w")
 f.write("ayo")
