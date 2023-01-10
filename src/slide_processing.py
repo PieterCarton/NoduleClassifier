@@ -4,6 +4,8 @@ import cv2
 from PIL import Image
 from image_util import cutoff
 
+DEFAULT_SMALL_AREA = 384
+
 OPENSLIDE_PATH = r'C:/openSlide/bin'
 if hasattr(os, 'add_dll_directory'):
     # Python >= 3.8 on Windows
@@ -34,21 +36,9 @@ def threshold(img, threshold_value):
 
     return new_img
 
-def process_slide(slide_location, level):
-    # -- 1. Open file containing slide --
-    slide = openslide.OpenSlide(slide_location)
-
-    # Get width of pixel in micrometers
-    PIXEL_SIZE = float(slide.properties.get(openslide.PROPERTY_NAME_MPP_X)) * (2**level)
-    PIXEL_AREA = PIXEL_SIZE * PIXEL_SIZE
-
-    # Get minimum areas of each nodule type
-    LARGE_AREA = int((0.02 * 1_000_000) / PIXEL_AREA)
-    MEDIUM_AREA = int((0.01 * 1_000_000) / PIXEL_AREA)
-    SMALL_AREA = int((0.005 * 1_000_000) / PIXEL_AREA)
-
-    # Extract supplied level of slide for further processing
-    original = slide.read_region((0, 0), level, slide.level_dimensions[level])
+def process_image(img, slide_name, LARGE_AREA=4*DEFAULT_SMALL_AREA, MEDIUM_AREA=2*DEFAULT_SMALL_AREA, SMALL_AREA=DEFAULT_SMALL_AREA):
+    # -- 1. Keep copy of original image -- 
+    original = img
 
 
     # -- 2. Apply threshold to seperate dark and light regions --
@@ -58,7 +48,7 @@ def process_slide(slide_location, level):
     img = cv2.cvtColor(np.array(img), cv2.COLOR_RGB2BGR)
 
     # -- 4. Dilate resulting image --
-    img = cv2.dilate(img, np.ones((7, 7)), iterations=1)
+    # img = cv2.dilate(img, np.ones((7, 7)), iterations=1)
 
     # -- 5. Get contours from image --
     img = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
@@ -83,8 +73,29 @@ def process_slide(slide_location, level):
     original = cv2.drawContours(original, medium_cnts, -1, (0, 255, 255), 3)
     original = cv2.drawContours(original, small_cnts, -1, (0, 255, 0), 3)
 
-    slide_name = slide_location.split("\\")[-1]
     cv2.imwrite(f"NoduleClassifier/output/{slide_name}_contour.png", original)
 
     total_area = calc_area(len(small_cnts), len(medium_cnts), len(large_cnts))
     return (slide_name, len(small_cnts), len(medium_cnts), len(large_cnts), total_area)
+
+
+
+def process_slide(slide_location, level):
+    # -- Open file containing slide --
+    slide = openslide.OpenSlide(slide_location)
+
+    # Get width of pixel in micrometers
+    PIXEL_SIZE = float(slide.properties.get(openslide.PROPERTY_NAME_MPP_X)) * (2**level)
+    PIXEL_AREA = PIXEL_SIZE * PIXEL_SIZE
+
+    # Get minimum areas of each nodule type
+    LARGE_AREA = int((0.02 * 1_000_000) / PIXEL_AREA)
+    MEDIUM_AREA = int((0.01 * 1_000_000) / PIXEL_AREA)
+    SMALL_AREA = int((0.005 * 1_000_000) / PIXEL_AREA)
+
+    # Extract supplied level of slide for further processing
+    img =  slide.read_region((0, 0), level, slide.level_dimensions[level])
+    slide_name = slide_location.split("\\")[-1]
+    return process_image(img, slide_name, LARGE_AREA, MEDIUM_AREA, SMALL_AREA)
+
+    
