@@ -5,3 +5,4 @@ openslide-python
 pillow
 pysimplegui
 scikit-image
+openpyxl

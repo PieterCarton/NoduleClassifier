@@ -94,7 +94,7 @@ def process_slide(slide_location, level):
     SMALL_AREA = int((0.005 * 1_000_000) / PIXEL_AREA)
 
     # Extract supplied level of slide for further processing
-    img =  slide.read_region((0, 0), level, slide.level_dimensions[level])
+    img = slide.read_region((0, 0), level, slide.level_dimensions[level])
     slide_name = slide_location.split("\\")[-1]
     return process_image(img, slide_name, LARGE_AREA, MEDIUM_AREA, SMALL_AREA)
 

@@ -1,3 +1,5 @@
+from openpyxl import load_workbook
+
 def write_result_to_file(file, result):
     file.write(
         f"""
@@ -29,3 +31,7 @@ def write_results_to_disk(results, location):
         write_result_to_file(f, result)
 
     f.close()
+
+def write_results_to_excel(results, location):
+    wb = load_workbook(location)
+    print(wb.sheetnames)

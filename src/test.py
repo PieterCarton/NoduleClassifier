@@ -1,37 +1,21 @@
+import os
 import numpy as np
 import cv2
 from PIL import Image
 
-org = cv2.imread("step3.png")
-im = cv2.imread("step3.png", cv2.IMREAD_GRAYSCALE)
-im = cv2.bitwise_not(im)
+OPENSLIDE_PATH = r'C:/openSlide/bin'
+if hasattr(os, 'add_dll_directory'):
+    # Python >= 3.8 on Windows
+    with os.add_dll_directory(OPENSLIDE_PATH):
+        import openslide
+else:
+    import openslide
 
-cnts, _ = cv2.findContours(im, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
+FOLDER = r"C:\Users\piete\Downloads\transfer_1899782_files_6b764aac\transfer_1793920_files_85b43f13"
+files = os.listdir(FOLDER)
+slides = list(filter(lambda f : f.endswith(".ndpi"), files))
 
-# seperate into small, medium and large blobs
-small = 20
-medium = 100
-large = 1000
-
-small_cnts = []
-medium_cnts = []
-large_cnts = []
-
-for cnt in cnts:
-    area = cv2.contourArea(cnt)
-    if area > large:
-        large_cnts.append(cnt)
-    elif area > medium:
-        medium_cnts.append(cnt)
-    elif area > small:
-        small_cnts.append(cnt)
-
-im = cv2.drawContours(im, large_cnts, -1, (0, 0, 255), 5)
-im = cv2.drawContours(im, medium_cnts, -1, (0, 255, 255), 5)
-im = cv2.drawContours(im, small_cnts, -1, (0, 255, 0), 5)
-
-cv2.imwrite("contrours.png", im)
-
-f = open("results.txt", "w")
-f.write("ayo")
-f.close()
+for slide_name in slides:
+    slide = openslide.OpenSlide(FOLDER + "\\" + slide_name)
+    img = slide.read_region((0, 0), 4, slide.level_dimensions[4])
+    img.save(f"./NoduleClassifier/output/pngs/{slide_name}.png")
