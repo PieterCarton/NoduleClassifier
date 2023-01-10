@@ -1,4 +1,4 @@
-from openpyxl import load_workbook
+# from openpyxl import load_workbook
 
 def write_result_to_file(file, result):
     file.write(
@@ -32,6 +32,6 @@ def write_results_to_disk(results, location):
 
     f.close()
 
-def write_results_to_excel(results, location):
-    wb = load_workbook(location)
-    print(wb.sheetnames)
+# def write_results_to_excel(results, location):
+#     wb = load_workbook(location)
+#     print(wb.sheetnames)
