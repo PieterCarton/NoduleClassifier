@@ -73,10 +73,10 @@ def process_image(img, slide_name, LARGE_AREA=4*DEFAULT_SMALL_AREA, MEDIUM_AREA=
     original = cv2.drawContours(original, medium_cnts, -1, (0, 255, 255), 3)
     original = cv2.drawContours(original, small_cnts, -1, (0, 255, 0), 3)
 
-    cv2.imwrite(f"NoduleClassifier/output/{slide_name}_contour.png", original)
+    cv2.imwrite(f"NoduleClassifier/output/no_dilation/{slide_name}_contour.png", original)
 
     total_area = calc_area(len(small_cnts), len(medium_cnts), len(large_cnts))
-    return (slide_name, len(small_cnts), len(medium_cnts), len(large_cnts), total_area)
+    return (slide_name, len(small_cnts)/2, len(medium_cnts)/2, len(large_cnts)/2, total_area)
 
 
 
