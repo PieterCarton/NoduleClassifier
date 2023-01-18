@@ -39,19 +39,29 @@ def threshold(img, threshold_value):
 def process_image(img, slide_name, LARGE_AREA=4*DEFAULT_SMALL_AREA, MEDIUM_AREA=2*DEFAULT_SMALL_AREA, SMALL_AREA=DEFAULT_SMALL_AREA):
     # -- 1. Keep copy of original image -- 
     original = img
+    iteration="ggb"
 
 
     # -- 2. Apply threshold to seperate dark and light regions --
     img = threshold(original, 300)
+    img.save(f"NoduleClassifier/output/{iteration}/{slide_name}_threshold.png")
 
     # -- 3. Convert to openCV image --
     img = cv2.cvtColor(np.array(img), cv2.COLOR_RGB2BGR)
 
     # -- 4. Dilate resulting image --
-    # img = cv2.dilate(img, np.ones((7, 7)), iterations=1)
+    img = cv2.dilate(img, np.ones((7, 7)), iterations=1)
+    cv2.imwrite(f"NoduleClassifier/output/{iteration}/{slide_name}_dilate.png", img)
 
     # -- 5. Get contours from image --
     img = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
+
+    # -----
+    #ret,img = cv2.threshold(img,127,255,cv2.THRESH_BINARY_INV)
+    #img = cv2.dilate(img, np.ones((3, 3)), iterations=1)
+    #cv2.imwrite(f"NoduleClassifier/output/{iteration}/{slide_name}.png", img)
+    # -----
+
     cnts, _ = cv2.findContours(img, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
     small_cnts = []
     medium_cnts = []
@@ -73,7 +83,7 @@ def process_image(img, slide_name, LARGE_AREA=4*DEFAULT_SMALL_AREA, MEDIUM_AREA=
     original = cv2.drawContours(original, medium_cnts, -1, (0, 255, 255), 3)
     original = cv2.drawContours(original, small_cnts, -1, (0, 255, 0), 3)
 
-    cv2.imwrite(f"NoduleClassifier/output/no_dilation/{slide_name}_contour.png", original)
+    cv2.imwrite(f"NoduleClassifier/output/{iteration}/{slide_name}_contour.png", original)
 
     total_area = calc_area(len(small_cnts), len(medium_cnts), len(large_cnts))
     return (slide_name, len(small_cnts)/2, len(medium_cnts)/2, len(large_cnts)/2, total_area)
