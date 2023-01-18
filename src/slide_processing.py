@@ -1,8 +1,7 @@
 import os
 import numpy as np
 import cv2
-from PIL import Image
-from image_util import cutoff
+from image_util import threshold
 
 DEFAULT_SMALL_AREA = 384
 
@@ -16,25 +15,6 @@ else:
 
 def calc_area(num_small, num_medium, num_large):
     return num_small * 0.005 + num_medium * 0.01 + num_large * 0.02
-
-def threshold(img, threshold_value):
-    pixel_map = img.load()
-
-    # create new images
-    new_img = Image.new(img.mode, img.size)
-    new_pixel_map = new_img.load()
-
-    # loop through all pixels
-    # this part is very slow!
-    # maybe cpyhton or 
-    for x in range(img.width):
-        for y in range(img.height):
-            # apply threshold to each pixel
-            new_pixel_map[x, y] = cutoff(pixel_map[x, y], (0, 0, 0), threshold_value)
-        if (x % int(img.height / 100) == 0):
-                print(f"Thresholding: column {x} out of {img.width}")
-
-    return new_img
 
 def process_image(img, slide_name, LARGE_AREA=4*DEFAULT_SMALL_AREA, MEDIUM_AREA=2*DEFAULT_SMALL_AREA, SMALL_AREA=DEFAULT_SMALL_AREA):
     # -- 1. Keep copy of original image -- 
