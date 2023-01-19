@@ -63,7 +63,7 @@ def write_results_to_excel(results, iteration, location):
     for result in results:
         r = find_row(result[0], sheet)
         for i in range(3):
-            sheet.cell(r, col + i).value = result[i + 1]
+            sheet.cell(r, col + i).value = result[3 - i]
     
     large_loss = 0
     medium_loss = 0
